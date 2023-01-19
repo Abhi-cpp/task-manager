@@ -2,6 +2,8 @@ const express = require('express')
 const router = new express.Router()
 const User = require('../models/user')
 const auth = require('../middleware/auth')
+const multer = require('multer')
+const sharp = require('sharp')
 //signup
 router.post("/users", async (req, res) => {
     const user = new User(req.body)
@@ -74,6 +76,49 @@ router.delete('/users/me', auth, async (req, res) => {
         res.status(200).send(req.user)
     } catch (e) {
         res.status(500).send()
+    }
+})
+
+const upload = multer({
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter(req, file, cb) {
+        const extension = file.originalname
+        if (!extension.match(/\.(png|jpeg|jpg)$/))
+            cb(new Error('File is not in valid format'))
+        cb(undefined, true)
+    }
+})
+
+router.post('/users/me/avatar', auth, upload.single('avatar'), async function (req, res) {
+    const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
+    req.user.avatar = buffer
+    await req.user.save()
+    res.send('done');
+}, (error, req, res, next) => {
+    res.status(400).send({ error: error.message })
+})
+//deleting image avatar
+router.delete('/users/me/avatar', auth, async (req, res) => {
+    try {
+        req.user.avatar = undefined
+        await req.user.save()
+        res.send('avatar deleted')
+    } catch (e) {
+        res.status(500).send("error deleting")
+    }
+})
+//getback image avatar
+router.get('/users/:id/avatar', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id)
+        if (!user || !user.avatar)
+            throw new Error()
+        res.set('content-Type', 'image/png')
+        res.send(user.avatar)
+    } catch (e) {
+        res.status(404).send()
     }
 })
 module.exports = router
