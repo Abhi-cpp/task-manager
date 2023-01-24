@@ -1,7 +1,7 @@
 const app = require('./app')
 const port = process.env.PORT
 
-connectDB().then(() => {
+app.connectDB().then(() => {
     app.listen(port, () => {
         console.log("server is up and running at port " + port)
     })
