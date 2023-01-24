@@ -20,7 +20,7 @@ const sendwelcomemail = (email, name) => {
         html: `<b>Welcome to our service, ${name}!</b>`
     })
 }
-const senddeleteemail = (email, name) => {
+const deleteAck = (email, name) => {
     transportobj.sendMail({
         from: 'Task Manager API <abhishek.kumar986871@gmail.com>',
         to: email,
@@ -31,5 +31,5 @@ const senddeleteemail = (email, name) => {
 }
 module.exports = {
     sendwelcomemail,
-    senddeleteemail
+    deleteAck
 }
