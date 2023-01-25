@@ -1,5 +1,4 @@
 const express = require('express')
-// require("./db/mongoose")
 const connectDB = require('./db/mongoose')
 const userRouter = require('./router/userRouter')
 const taskRouter = require('./router/taskRouter')
@@ -10,10 +9,6 @@ app.use(express.json())
 app.use(userRouter)
 app.use(taskRouter)
 
-connectDB().then(() => {
-    // app.listen(port, () => {
-    //     console.log("server is up and running at port " + port)
-    // })
-})
+connectDB()
 
 module.exports = app
